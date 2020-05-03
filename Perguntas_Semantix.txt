@@ -1,0 +1,29 @@
+1-	Qual o objetivo do comando cache em Spark?
+R: Uma boa prática deve-se a quando queremos realizar algum enriquecimento de dados, utilizamos cache para persistir o mesmo em memória. Mas também podemos falar que depende muito, por exemplo, qual será a plataforma / provider. Cada ambiente tem uma forma para se trabalhar, as vezes o que é melhor ser executado em um “lugar” não é no outro.
+
+2-	O mesmo código implementado em Spark é normalmente mais rápido que a implementação equivalente em MapReduce. Por quê?
+R: Devido o processamento ser em memória, o Spark é muito mais rápido e pode ser utilizado em quase todas as situações, para todo tipo de processamento, como por exemplo, análise de dados em streaming (real time / near real time), análise de dados em machine learning (aprendizado de máquina) ou workloads SQL.
+
+3-	Qual é a função do SparkContext?
+R: Na versão 2.4 do Spark ele é o ponto essencial de entrada para a funcionalidade do Spark. O mesmo reflete a conexão com um cluster Spark, também pode ser usado para a criação de um RDD e transmitir variáveis para o cluster.
+
+4-	Explique com suas palavras o que é Resilient Distributed Datasets (RDD).
+R: Um RDD é a representação de um conjunto de registros, coleção imutável de objetos distribuídos. Eles são tolerantes a falhas, ou seja, no caso de ocorrer uma falha são auto-recuperados. O RDD é um objeto funcional, diferentemente do dataframe que é um objeto relacional.
+
+5 - GroupByKey é menos eficiente que reduceByKey em grandes dataset. Por quê?
+O GroupByKey fará a persistência em disco apenas de cada chave encontrada, o que teremos uma grande oneração neste caso, para apenas depois deste passo realizar a soma dos mesmos. Já o reduceByKey realiza o reduce (com chave e valor) em cada bloco de dados em memória, antes de persistir em disco. Desta forma se tem agilidade, no reduce final ele apenas vai acrescentando/somando os valores que vão chegando no disco com uma conta pré realizada, não havendo a necessidade de pegar cada chave e valor, um a um, como é feito no groupByKey para a soma total no final. 
+
+
+Explique o que o código Scala abaixo faz.
+
+# Esta realizando a leitura do arquivo no HDFS do Hadoop
+val textFile = sc.textFile("hdfs://...")
+
+# Esta splitando as palavras utilizando espaço como parametro
+val counts = textFile.flatMap(line => line.split(" "))
+
+# Utiliza a função map para dar o valor 1 para as palavras encontradas em seus respectivos nós do cluster                                              .reduceByKey(_ + _) # Realiza o reduce para agrupamento e então contar os valores/palavras, sabendo então qual  o resultado final
+.map(word=>(word,1))
+
+# com a variável ‘counts’ com o resultado final, está sendo salva como um arquivo de texto no HDFS do Hadoop
+ counts.saveAsTextFile("hdfs://...")
